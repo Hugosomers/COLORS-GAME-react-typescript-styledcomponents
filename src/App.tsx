@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 function App() {
+  const [saveHex, setSaveHex] = useState<number>(16777215);
+
   const [correctColor, setCorrectColor] = useState(
-    Math.floor(Math.random() * 16777215).toString(16)
+    Math.floor(Math.random() * saveHex).toString(16)
   );
 
   const [wrongColors, setWrongColors] = useState(
-    Math.floor(Math.random() * 16777215).toString(16)
+    Math.floor(Math.random() * saveHex).toString(16)
   );
 
   const [circlesCount, setCirclesCount] = useState({ length: 3 });
@@ -27,23 +29,28 @@ function App() {
   const [points, setPoints] = useState<number>(0);
 
   const circleClickHandle = (e: any) => {
+    if (saveHex > 100000) {
+      setSaveHex(saveHex - 300000);
+    }
     if (e.target.className.split(' ').includes('correct')) {
       setPoints(points + 1);
       setCirclesCount({ length: circlesCount.length + 1 });
-      setWrongColors(Math.floor(Math.random() * 16777215).toString(16));
-      setCorrectColor(Math.floor(Math.random() * 16777215).toString(16));
+      setWrongColors(Math.floor(Math.random() * saveHex).toString(16));
+      setCorrectColor(Math.floor(Math.random() * saveHex).toString(16));
+    } else {
+      alert('Game Over');
+      setPoints(0);
+      setCirclesCount({ length: 3 });
+      setSaveHex(16777215);
     }
   };
 
   console.log(wrongColors, correctColor, circlesClass);
 
   return (
-    <div>
-      <Title>Check the different color</Title>
-      <PointsContainer>
-        <span>Pontuação:</span>
-        <PoinstDiv>{points}</PoinstDiv>
-      </PointsContainer>
+    <Main>
+      <Title>Find the different color</Title>
+      <PointsContainer>{points}</PointsContainer>
       <Section>
         {Array.from(circlesCount).map((i, index) => (
           <Circle
@@ -54,7 +61,7 @@ function App() {
           />
         ))}
       </Section>
-    </div>
+    </Main>
   );
 }
 
@@ -62,17 +69,19 @@ interface CircleProps extends React.HTMLAttributes<HTMLDivElement> {
   colorOptions: { correctColor: string; wrongColors: string };
 }
 
+const Main = styled.main`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
 const PointsContainer = styled.div`
   color: #f4f3ee;
   width: 300px;
-`;
-
-const PoinstDiv = styled.div`
-  border: 1px solid #bcb8b1;
-  color: #f4f3ee;
-  font-size: 30px;
-  width: 50px;
   text-align: center;
+  margin: 10px;
+  font-size: 25px;
 `;
 
 const Title = styled.h1`
@@ -80,12 +89,13 @@ const Title = styled.h1`
 `;
 
 const Section = styled.section`
-  background-color: #8a817c;
+  background-color: #fffe;
   border-radius: 10px;
   width: 500px;
   min-height: 500px;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const Circle = styled.div<CircleProps>`
